@@ -7,10 +7,11 @@
     <title>Nightbot</title>
 </head>
 <body>
-    <h1>site</h1>
-    <script>
-        var url = "https://funnysentences.com/sentence-generator/";
-        fetch(url, {mode: "cors"}).then(response => response.text()).then(r => console.log(r));
-    </script>
+    <h1>
+        <script>
+            var url = "https://funnysentences.com/sentence-generator/";
+            return fetch(url, {mode: "no-cors"}).then(response => response.body);
+        </script>
+    </h1>
 </body>
 </html>
