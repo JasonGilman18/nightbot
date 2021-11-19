@@ -8,5 +8,17 @@
   },
   "author": "",
   "license": "ISC",
-  "proxy": "https://funnysentences.com/"
+  "dependencies": {
+    "ejs": "^3.1.6",
+    "express": "^4.17.1",
+    "express-session": "^1.17.2",
+    "fetch": "^1.1.0",
+    "handlebars": "^4.7.7",
+    "node-fetch": "^3.1.0",
+    "passport": "^0.5.0",
+    "passport-oauth": "^1.0.0",
+    "request": "^2.88.2",
+    "tmi.js": "^1.8.5"
+  },
+  "type": "module"
 }
