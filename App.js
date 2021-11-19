@@ -22,6 +22,7 @@ app.get('/redirect', (req, res) => {
     creds.setAuthCode(authCode);
     const bot = new BotService(creds);
     bot.process();
+    res.render("./index.html");
 });
 
 app.listen(port, () => {
