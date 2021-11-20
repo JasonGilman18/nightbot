@@ -1,17 +1,20 @@
 import fetch from "node-fetch";
 import tmi from 'tmi.js';
+import WebScraperService from "./WebScraperService.js";
 
-export class BotService {
+export default class BotService {
     
     creds;
+    webScraper;
 
     constructor(credentialBuilder) {
         this.creds = credentialBuilder;
+        this.webScraper = new WebScraperService();
     }
 
     process() {
         this.getAccessTokenFromTwtich()
-            .then(accessToken => this.constructClient(accessToken))
+            .then(accessToken => this.constructClient())
             .then(client => this.setupBot(client));
     }
     
@@ -25,7 +28,7 @@ export class BotService {
             });
     }
 
-    constructClient(accessToken) {
+    constructClient() {
         return new tmi.Client({
             connection: {
                 secure: true,
@@ -42,16 +45,14 @@ export class BotService {
     setupBot(client) {
         client.connect();
         client.on('connected', (channel, tags, message, self) => {
-            //client.say(channel, "Hello!");
-            console.log(`${message}`);
-        });
-            
+            console.log("connected here");
+            //client.say(channel, "Something is happening...");
+        });   
         client.on('message', (channel, tags, message, self) => {
             console.log(`${tags['display-name']}: ${message}`);
-            
             //client.say(channel, "am i working???")
-            //if(message == "hello")
-            //  client.say(channel, "A bot speaks...");
+            //if(message == "!bot")
+                //client.say(channel, "A bot speaks...");
         });
     }
 }
