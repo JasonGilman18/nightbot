@@ -1,4 +1,4 @@
-export default class CredentialBuilder {
+export default class CredentialService {
   static TWITCH_AUTHORIZATION_ENDPOINT = 'https://id.twitch.tv/oauth2/authorize';
   
   static TWITCH_TOKEN_URL = 'https://id.twitch.tv/oauth2/token';
@@ -23,7 +23,7 @@ export default class CredentialBuilder {
   }
 
   buildTwitchAuthorizationURL() {
-    return CredentialBuilder.TWITCH_AUTHORIZATION_ENDPOINT + "?" + 
+    return CredentialService.TWITCH_AUTHORIZATION_ENDPOINT + "?" + 
       "client_id=" + this.TWITCH_CLIENT_ID + 
       "&redirect_uri=" + this.TWITCH_REDIRECT_URI + 
       "&response_type=code" + 
@@ -31,7 +31,7 @@ export default class CredentialBuilder {
   }
 
   buildTwitchAccessTokenURL() {
-    return CredentialBuilder.TWITCH_TOKEN_URL + "?" + 
+    return CredentialService.TWITCH_TOKEN_URL + "?" + 
       "client_id=" + this.TWITCH_CLIENT_ID + 
       "&client_secret=" + this.TWITCH_CLIENT_SECRET + 
       "&code=" + this.TWITCH_AUTH_CODE + 

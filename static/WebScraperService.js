@@ -1,8 +1,8 @@
 import fetch from 'node-fetch';
 
 export default class WebScraperService {
-
-    static SECONDS_TO_MILLISECONDS = 1000;
+    
+    static SCRAPE_URL = "https://funnysentences.com/sentence-generator/";
 
     constructor() {}
 
@@ -12,7 +12,7 @@ export default class WebScraperService {
     }
 
     getWebsitePage() {
-        return fetch("https://funnysentences.com/sentence-generator/")
+        return fetch(WebScraperService.SCRAPE_URL)
             .then(response => response.text());
     }
 
