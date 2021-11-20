@@ -63,24 +63,50 @@ export default class BotService {
                     
                     switch(message) {
                         case "!bot":
-                            console.log(`SENDER: ${tags['display-name']}\nACTION: WELCOME_MSG_RESPONSE\nMSG: ${message}\n`);
-                            this.respondWithBot("Welcome to the stream!", channel);
+                            this.welcomeMessageResponse(channel, tags, message);
                             break;
                         case "!random":
-                            console.log(`SENDER: ${tags['display-name']}\nACTION: RANDOM_MSG_RESPONSE\nMSG: ${message}\n`);
-                            this.webScraperService.process()
-                                .then(msg => this.respondWithBot(msg, channel));
+                            this.randomMessageResponse(channel, tags, message);
                             break;
                         default:
-                            console.log(`SENDER: ${tags['display-name']}\nACTION: NONE\nMSG: ${message}\n`);
+                            this.startLog(tags['display-name'], "NONE", message);
                             break;
                     }
                 });
             });
     }
 
+    welcomeMessageResponse(channel, tags, message) {
+        this.startLog(tags['display-name'], "WELCOME_MSG_RESPONSE", message);
+        this.respondWithBot("Welcome to the stream!", channel)
+            .then(ok => this.endLog("WELCOME_MSG_RESPONSE", ok));
+    }
+
+    randomMessageResponse(channel, tags, message) {
+        this.startLog(tags['display-name'], "RANDOM_MSG_RESPONSE", message);
+        this.webScraperService.process()
+            .then(msg => {
+                this.respondWithBot(msg, channel)
+                    .then(ok => this.endLog("RANDOM_MSG_RESPONSE", ok));
+            });
+    }
+
     respondWithBot(msg, channel) {
-        console.log(`SENDER: e__thereal_bot\nACTION: NONE\nMSG: ${msg}\n`);
-        this.client.say(channel, msg);
+        this.startLog("e__thereal_bot", "NONE", msg);
+        return this.client.say(channel, msg)
+            .then( (data) => {
+                return data[0] == channel && data[1] == msg;
+            })
+            .catch( (err) => {
+                return false;
+            });
+    }
+
+    startLog(sender, action, msg) {
+        console.log(`SENDER: ${sender}\nSTARTING ACTION: ${action}\nMSG: ${msg}\n`);
+    }
+
+    endLog(action, ok) {
+        console.log(`ENDING ACTION: ${action}\nSTATUS: ${ok ? "OK" : "ERROR"}`);
     }
 }
