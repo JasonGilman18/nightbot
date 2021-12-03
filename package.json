@@ -25,7 +25,7 @@
       "src/**/*"
     ],
     "targets": [
-      "node16-linux-arm64"
+      "node16-win-x64"
     ]
   }
 }
