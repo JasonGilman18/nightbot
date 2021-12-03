@@ -1,4 +1,4 @@
-export default class CredentialService {
+module.exports = class CredentialService {
   static TWITCH_AUTHORIZATION_ENDPOINT = 'https://id.twitch.tv/oauth2/authorize';
   
   static TWITCH_TOKEN_URL = 'https://id.twitch.tv/oauth2/token';

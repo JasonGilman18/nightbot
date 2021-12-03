@@ -1,22 +1,17 @@
-import express from 'express';
-import ejs from 'ejs';
-import open from 'open';
-import CredentialService from './static/CredentialService.js';
-import { 
-    BOT_USERNAME, 
-    CHANNEL_NAME, 
-    TWITCH_CLIENT_ID, 
-    TWITCH_CLIENT_SECRET, 
-    TWITCH_REDIRECT_URI, 
-    TWITCH_SCOPE
-} from "./credentials.js";
-import BotService from './static/BotService.js';
+const express = require("express");
+const ejs = require("ejs");
+const open = require("open");
+const path = require("path");
+const CredentialService = require("./src/CredentialService");
+const credentials = require("./src/credentials");
+const BotService = require("./src/BotService");
 
 const server = express();
 server.engine('html', ejs.renderFile);
+server.use(express.static("src"));
 const port = 3000;
-const credService = new CredentialService(TWITCH_CLIENT_ID, TWITCH_CLIENT_SECRET, 
-    TWITCH_REDIRECT_URI, TWITCH_SCOPE, CHANNEL_NAME, BOT_USERNAME);
+const credService = new CredentialService(credentials.TWITCH_CLIENT_ID, credentials.TWITCH_CLIENT_SECRET, 
+    credentials.TWITCH_REDIRECT_URI, credentials.TWITCH_SCOPE, credentials.CHANNEL_NAME, credentials.BOT_USERNAME);
 
 server.get('/', (req, res) => {
     res.redirect(credService.buildTwitchAuthorizationURL());
@@ -27,9 +22,11 @@ server.get('/redirect', (req, res) => {
     credService.setAuthCode(authCode);
     const bot = new BotService(credService);
     bot.process();
-    res.render("./bot.html");
+    res.render(path.join(__dirname, "src", "bot.html"));
 });
 
 server.listen(port, () => {
     open(`http://localhost:${port}`);
+    console.log("\nBOT IS RUNNING\n");
+    console.log("Once authenticated in your browser, chat messages will appear here.\n\n");
 });

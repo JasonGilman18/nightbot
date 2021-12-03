@@ -1,8 +1,8 @@
-import fetch from "node-fetch";
-import tmi from 'tmi.js';
-import WebScraperService from "./WebScraperService.js";
+const fetch = require("node-fetch");
+const tmi = require("tmi.js");
+const WebScraperService = require("./WebScraperService");
 
-export default class BotService {
+module.exports = class BotService {
     
     credService;
     client;
@@ -53,10 +53,6 @@ export default class BotService {
     setupBot() {
         this.client.connect()
             .then( (data) => {
-                this.client.on('connected', (address, port) => {
-                    console.log("\n\nBOT IS CONNECTED\n\n");
-                });
-                
                 this.client.on('message', (channel, tags, message, self) => {
                     if(self)
                         return;
