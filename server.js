@@ -2,16 +2,16 @@ const express = require("express");
 const ejs = require("ejs");
 const open = require("open");
 const path = require("path");
+const config = require("./src/config");
 const CredentialService = require("./src/CredentialService");
-const credentials = require("./src/credentials");
 const BotService = require("./src/BotService");
 
 const server = express();
 server.engine('html', ejs.renderFile);
 server.use(express.static("src"));
 const port = 3000;
-const credService = new CredentialService(credentials.TWITCH_CLIENT_ID, credentials.TWITCH_CLIENT_SECRET, 
-    credentials.TWITCH_REDIRECT_URI, credentials.TWITCH_SCOPE, credentials.CHANNEL_NAME, credentials.BOT_USERNAME);
+const credService = new CredentialService(config.TWITCH_CLIENT_ID, config.TWITCH_CLIENT_SECRET, 
+    config.TWITCH_REDIRECT_URI, config.TWITCH_SCOPE, config.CHANNEL_NAME, config.BOT_USERNAME);
 
 server.get('/', (req, res) => {
     res.redirect(credService.buildTwitchAuthorizationURL());

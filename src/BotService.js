@@ -1,5 +1,7 @@
 const fetch = require("node-fetch");
 const tmi = require("tmi.js");
+const cron = require("node-cron");
+const responses = require("./responses.json");
 const WebScraperService = require("./WebScraperService");
 
 module.exports = class BotService {
@@ -7,11 +9,13 @@ module.exports = class BotService {
     credService;
     client;
     webScraperService;
+    scheduledMessagesRunning;
 
     constructor(credentialService) {
         this.credService = credentialService;
         this.client = new tmi.Client();
         this.webScraperService = new WebScraperService();
+        this.scheduledMessagesRunning = false;
     }
 
     process() {
@@ -53,56 +57,52 @@ module.exports = class BotService {
     setupBot() {
         this.client.connect()
             .then( (data) => {
+                this.client.on('join', (channel, username, self) => {
+                    if(self && !this.scheduledMessagesRunning) {
+                        this.respondWithBot("JOIN_MSG_RESPONSE", "etherealisme_bot", "", channel)
+                        this.startScheduledMessages(channel);
+                    }
+                });
+
                 this.client.on('message', (channel, tags, message, self) => {
                     if(self)
                         return;
                     
                     switch(message) {
                         case "!bot":
-                            this.welcomeMessageResponse(channel, tags, message);
+                            this.respondWithBot("WELCOME_MSG_RESPONSE", tags["username"], message, channel);
                             break;
                         case "!random":
-                            this.randomMessageResponse(channel, tags, message);
+                            this.respondWithBot("RANDOM_MSG_RESPONSE", tags["username"], message, channel);
                             break;
                         default:
-                            this.startLog(tags['display-name'], "NONE", message);
+                            this.processLog(true, "INCOMING_CHAT_MSG", tags["username"], message);
                             break;
                     }
                 });
             });
     }
 
-    welcomeMessageResponse(channel, tags, message) {
-        this.startLog(tags['display-name'], "WELCOME_MSG_RESPONSE", message);
-        this.respondWithBot("Welcome to the stream!", channel)
-            .then(ok => this.endLog("WELCOME_MSG_RESPONSE", ok));
-    }
-
-    randomMessageResponse(channel, tags, message) {
-        this.startLog(tags['display-name'], "RANDOM_MSG_RESPONSE", message);
-        this.webScraperService.process()
-            .then(msg => {
-                this.respondWithBot(msg, channel)
-                    .then(ok => this.endLog("RANDOM_MSG_RESPONSE", ok));
-            });
-    }
-
-    respondWithBot(msg, channel) {
-        this.startLog("e__thereal_bot", "NONE", msg);
-        return this.client.say(channel, msg)
+    respondWithBot(processName, triggerUsername, triggerMessage, channel) {
+        return this.client.say(channel, "" + responses[processName])
             .then( (data) => {
-                return data[0] == channel && data[1] == msg;
+                this.processLog(data[0] == channel && responses[processName], processName, triggerUsername, triggerMessage);
             })
             .catch( (err) => {
-                return false;
+                this.processLog(false, processName, triggerUsername, triggerMessage);
             });
     }
 
-    startLog(sender, action, msg) {
-        console.log(`SENDER: ${sender}\nSTARTING ACTION: ${action}\nMSG: ${msg}\n`);
+    processLog(ok, processName, triggerUsername, triggerMessage) {
+        const now = new Date();
+        console.log(`[${now.toTimeString()}] ${processName} has ${ok ? "FINISHED" : "FAILED"} after being triggered by user \"${triggerUsername}\" with message \"${triggerMessage}\".\n`);
     }
 
-    endLog(action, ok) {
-        console.log(`ENDING ACTION: ${action}\nSTATUS: ${ok ? "OK" : "ERROR"}`);
+    startScheduledMessages(channel) {
+        const interval_minutes = 10;
+        this.scheduledMessagesRunning = true;
+        cron.schedule(`*/${interval_minutes} * * * *`, () => {
+            this.respondWithBot("SCHEDULED_MSG_RESPONSE", "", "", channel);
+        }).start();
     }
 }
