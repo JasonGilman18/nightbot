@@ -1,4 +1,4 @@
 node_modules
 .ds_store
 credentials.js
-dist
+*.exe
